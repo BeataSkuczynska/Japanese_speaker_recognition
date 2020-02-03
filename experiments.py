@@ -97,7 +97,7 @@ and mean of the timeseries over each channel '''
 '''The highest obtained score was around 89%. Generally, not worth it.'''
 
 '''C-Support Vector Classification with linear kernel and flattened cepstral data'''
-# transformed_train = np.reshape(train_input, (270, 26*12))
+# transformed_train = np.reshape(train_input, (270, -1))
 # train_output_simple = np.zeros(shape=270)
 #
 # for c in range(270):
@@ -110,8 +110,9 @@ and mean of the timeseries over each channel '''
 # print(round(scores.mean(), 3), round(scores.std(), 3))
 '''Around 89% validation score'''
 
+
 '''C-Support Vector Classification with rbf kernel and flattened cepstral data'''
-# transformed_train = np.reshape(train_input, (270, 26*12))
+# transformed_train = np.reshape(train_input, (270, -1))
 # train_output_simple = np.zeros(shape=270)
 #
 # for c in range(270):
@@ -172,10 +173,10 @@ Features scaled to [0, 1] range'''
 #     train_output_simple[c] = speaker
 #
 # clf = svm.SVC(kernel='rbf')
-# scores = cross_val_score(clf, transformed_train, train_output_simple, cv=10)
+# scores = cross_val_score(clf, transformed_train, train_output_simple, cv=5)
 # print(scores)
 # print(round(scores.mean(), 3), round(scores.std(), 3))
-'''Around 92% validation score'''
+'''Around 90.5% validation score'''
 
 '''C-Support Vector Classification with rbf kernel, flattened cepstral data and increased amount of folds. 
 Features scaled to [0, 1] range. Initial grid search over C and gamma parameters.'''
@@ -183,21 +184,22 @@ Features scaled to [0, 1] range. Initial grid search over C and gamma parameters
 #
 # transformed_train = np.reshape(train_input, (270, -1))
 # transformed_train = min_max_scaler.fit_transform(transformed_train)
+# print (np.var(transformed_train))
 # train_output_simple = np.zeros(shape=270)
 #
 # for c in range(270):
 #     speaker = np.nonzero(train_output[c, 0])[0]
 #     train_output_simple[c] = speaker
 #
-# params = dict(C=np.logspace(-2, 10, 13), gamma=np.logspace(-9, 3, 13))
-#
+# params = dict(C=np.logspace(-3, 3, 7), gamma=np.logspace(-3, 3, 7))
+# print(params)
 # clf = svm.SVC(kernel='rbf')
 # grid_search = GridSearchCV(clf, params, cv=5, verbose=1)
 # grid_search.fit(transformed_train, train_output_simple)
 # print(grid_search.best_params_)
 # print(grid_search.best_score_)
 '''{'C': 100.0, 'gamma': 0.001}
-            0.94'''
+            94.1%'''
 
 '''C-Support Vector Classification with rbf kernel, flattened cepstral data and increased amount of folds. 
 Features scaled to [0, 1] range. Further grid search over C and gamma parameters.'''
@@ -258,11 +260,11 @@ for c in range(370):
 clf = svm.SVC(kernel='rbf', C=40.0, gamma=0.0014)
 clf.fit(transformed_train, train_output_simple)
 predicted = clf.predict(transformed_test)
-# score = clf.score(transformed_test, test_output_simple)
-# print(score)
+score = clf.score(transformed_test, test_output_simple)
+print(score)
 '''96.2% accuracy'''
 
 '''Confusion matrix for final model'''
-conf_matrix = confusion_matrix(test_output_simple, predicted, normalize='true')
+conf_matrix = confusion_matrix(test_output_simple, predicted, normalize="true")
 conf_matrix_rounded = np.around(conf_matrix, 3)
 print(conf_matrix_rounded)
